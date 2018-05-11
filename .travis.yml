@@ -8,6 +8,6 @@ script:
   - npm run build
 deploy:
   provider: heroku
-  app: bcg-messenger
+  app: shri-msg-maxishake
   api_key: 
     secure: "20dbd5e7-cb3b-4dde-b35f-c294a0ab0a96"
