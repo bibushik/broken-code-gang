@@ -1,6 +1,6 @@
 const { findUserBySid, getUsers, getUser, addUser, setCurrentUser, logoutUser } = require('./database/user');
 const {
-    joinRoom, leaveRoom, getRooms, getUserRooms, createRoom, getRoom, dropRoom, renameRoom, enterRoom
+    joinRoom, leaveRoom, getRooms, getUserRooms, createRoom, getRoom, dropRoom, renameRoom, enterRoom, getLastRoomVisit
 } = require('./database/room');
 const { getMessages, sendMessage } = require('./database/messages');
 const { getSessionInfoByUserId } = require('./database/session');
@@ -205,6 +205,18 @@ module.exports = function (db, io) {
             return getUserRooms(db, currentUser._id, params);
         });
 
+        // Get last room visit for current user
+        requestResponse(TYPES.GET_LAST_ROOM_VISIT, async (roomId) => {
+            const currentUser = await CurrentUser();
+
+            const payload = {
+                roomId: roomId,
+                userId: currentUser._id,
+            };
+
+            return getLastRoomVisit (db, payload);
+        });
+
         // Drop room
         requestResponse(TYPES.DROP_ROOM, async (roomId) => {
             return await dropRoom(db, roomId);
@@ -237,7 +249,7 @@ module.exports = function (db, io) {
             userWasJoinedToRoom(payload);
 
             const userName = await getUser(db, payload.userId);
-            const message = `${userName.name} вошел чат`;
+            const message = `${userName.name} теперь в чате`;
             const msgPayload = {
                 roomId : payload.roomId,
                 message: message

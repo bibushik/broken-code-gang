@@ -62,7 +62,6 @@ class App extends Component {
     }
 
     componentWillMount(){
-        console.log(this.props);
         this.loadApp()
         .catch ((e)=>{
             console.log(e);
@@ -70,7 +69,6 @@ class App extends Component {
             
         
             .then((user) => {
-                console.log(user);
                if (user){
 
                    const app = this;

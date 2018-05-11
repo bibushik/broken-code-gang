@@ -80,6 +80,10 @@ module.exports = {
     CURRENT_USER_ENTER_ROOM: 'CURRENT_USER_ENTER_ROOM',
 
     /**
+     * Get last room visit
+     */
+    GET_LAST_ROOM_VISIT: 'GET_LAST_ROOM_VISIT',
+    /**
      * Remove user from room
      */
     REMOVE_USER_FROM_ROOM: 'REMOVE_USER_FROM_ROOM',

@@ -23,7 +23,6 @@ const TABLE = 'users';
  */
 async function findUserBySid(db, sid) {
     const session = await getSessionInfo(db, sid);
-    console.log(session);
     return getUser(db, session.userId);
 }
 

@@ -27,7 +27,7 @@
     "uuid": "^3.2.1"
   },
   "scripts": {
-    "start": "concurrently \"npm run client\" \"npm run server\"",
+    "start": "concurrently \"npm run client\" \"npm run server-dev\"",
     "build": "react-scripts build",
     "jest": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
@@ -47,6 +47,7 @@
     "@storybook/react": "^3.3.15",
     "babel-core": "^6.26.0",
     "babel-preset-react-app": "^3.1.1",
+    "bcrypt": "^2.0.1",
     "chai-enzyme": "^0.8.0",
     "cross-env": "^5.1.4",
     "emojify.js": "^1.1.0",

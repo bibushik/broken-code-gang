@@ -31,15 +31,18 @@ export default function addRoom(name, user) {
 export function updateLastMessage(message) {
     return async function (dispatch) {
         try {
+            let newRoomName = '';
             if (message.userId) {
                 message.userName = (await api.getUser(message.userId)).name;
             } else {
                 message.userName = "";
+                newRoomName = (await api.getRoom(message.roomId)).name;
             }
 
             dispatch({
                 type: 'ROOMS_UPDATE_LAST_MESSAGE',
-                newMessage: message
+                newMessage: message,
+                newRoomName: newRoomName
             });
         }catch (error){
             return {

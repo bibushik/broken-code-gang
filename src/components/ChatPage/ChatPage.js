@@ -33,8 +33,9 @@ export class ChatPage extends Component {
         this.openChatSettings = this.openChatSettings.bind(this);
     }
 
-    componentWillMount = () => {
+    componentWillMount = async () => {
         this.getChatInfo(this.props.payload.currentRoom);
+        const lastVisit = await api.currentUserEnterRoom(this.props.payload.currentRoom);
     };
 
     getChatInfo = async (chatId) => {
@@ -72,8 +73,6 @@ export class ChatPage extends Component {
     }
 
     render() {
-
-        //api.currentUserEnterRoom(this.props.payload.currentRoom);
 
         const messages = this.props.messages.items,
             next = this.props.messages.next,

@@ -68,8 +68,28 @@
     display: flex;
 }
 
-.InstanceSummaryElement__avatar_acronim {
+.InstanceSummaryElement__info_unreadMsgCount_wrapper{
+    width: 18px;
+    height: 18px;
+    color: #F13564;
+    border-radius: 50%;
+    border: 2px solid #F13564;
+    display: flex;
+}
+
+.InstanceSummaryElement__avatar_acronim, .InstanceSummaryElement__info_unreadMsgCount {
     margin: auto;
     text-transform: uppercase;
     font-weight: 700;
 }
+.InstanceSummaryElement__desc_wrap {
+    display: grid;
+    align-items: baseline;
+}
+.InstanceSummaryElement__desc {
+    grid-column: 1/9;
+}
+.InstanceSummaryElement__info_unreadMsgCount_wrapper {
+    grid-column: 9/10;
+}
+

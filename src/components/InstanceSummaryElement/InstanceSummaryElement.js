@@ -15,7 +15,7 @@ export class InstanceSummaryElement extends Component {
 
         const { summary } = this.props;
         const {
-            title, description, author, descModifiers,timestamp
+            title, description, author, descModifiers,timestamp, unreadMsgCount
         } = summary;
 
         let titleClasses = 'InstanceSummaryElement__title';
@@ -55,6 +55,10 @@ export class InstanceSummaryElement extends Component {
             timestampView = <p className="InstanceSummaryElement__info_timestamp">{timestamp}</p>;
         }
 
+        let unreadMsgCountView ='';
+        if(unreadMsgCount && unreadMsgCount !== '0'){
+            unreadMsgCountView = <div className="InstanceSummaryElement__info_unreadMsgCount_wrapper"><p className="InstanceSummaryElement__info_unreadMsgCount">{unreadMsgCount}</p></div>;
+        }
 
         return (
             <div className="InstanceSummaryElement" onClick={this.handleClick}>
@@ -66,7 +70,10 @@ export class InstanceSummaryElement extends Component {
                         <h3 className={titleClasses}>{title}</h3>
                         {timestampView}
                     </div>
-                    {descView}
+                    <div className="InstanceSummaryElement__desc_wrap">
+                        {descView}
+                        {unreadMsgCountView}
+                    </div>
                 </div>
             </div>
         );

@@ -1,5 +1,4 @@
 export const addMessage = (message) => {
-        console.log(message);
         return ({
             type: 'MESSAGE_ADD',
             message,

@@ -158,6 +158,15 @@ class Api {
     }
 
     /**
+     * Return last room visit
+     */
+
+    async getLastVisit(roomId) {
+        return this._requestResponse(MESSAGES.GET_LAST_ROOM_VISIT, roomId);
+    }
+
+
+    /**
      * Return list of rooms for current user
      *
      * @param {{ limit: number }} [filter]

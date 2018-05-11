@@ -210,6 +210,7 @@ async function leaveRoom(db, { roomId, userId }) {
  * @return {Promise<Room>} // last visit timestamp
  */
 async function enterRoom(db, { roomId, userId }) {
+    console.log('enterRoom roomId userId' + roomId + " " + userId);
     if (!roomId) {
         throw new Error('You must specify roomId to join');
     }
@@ -229,13 +230,32 @@ async function enterRoom(db, { roomId, userId }) {
         throw new Error(`Unknown user with id=${userId}`);
     }
 
-    room.users = room.users
-        .filter(user => user.toString() !== userId.toString());
-
     // Save last visit to database
     const lastVisit = Date.now();
-    await collection.updateOne({$and: [{ room_id: room._id }, {user_id: user._id} ]}, { $set: { last_visit: lastVisit  } });
+
+    const previousVisit = await collection.findOne({$and: [{ room_id: ObjectId(roomId) }, {user_id: ObjectId(userId)} ]});
+    if(previousVisit) {
+        await collection.updateOne({$and: [{ room_id: ObjectId(roomId) }, {user_id: ObjectId(userId)} ]}, { $set: { last_visit: lastVisit  } });
+    } else {
+        await collection.insertOne({ room_id: ObjectId(roomId), user_id: ObjectId(userId), last_visit: lastVisit });
+    }
     return lastVisit;
+}
+
+/**
+ *
+ */
+
+async function getLastRoomVisit(db, {roomId, userId}) {
+    if (!roomId) {
+        throw new Error('You must specify roomId to join');
+    }
+
+    let collection = db.collection(TABLE_VISIT);
+
+    const lastVisitObj = await collection.findOne({$and: [{ room_id: ObjectId(roomId) }, {user_id: ObjectId(userId)} ]});
+
+    return lastVisitObj;
 }
 
 /**
@@ -302,5 +322,6 @@ module.exports = {
     leaveRoom,
     dropRoom,
     renameRoom,
-    enterRoom
+    enterRoom,
+    getLastRoomVisit
 };

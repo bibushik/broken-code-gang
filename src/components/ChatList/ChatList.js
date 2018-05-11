@@ -35,16 +35,18 @@ export const ChatList = connect(stateToProps)(class ChatList extends React.Compo
         return (
             <InfiniteRooms fetchNext={fetchNext} next={next}>
                 {rooms.map((room) => {
-                    let roomName = room.name,
+                    let roomName = room.newRoomName || room.name,
                         date = new Date(),
                         author='',
                         description='',
-                        timestamp='';
+                        timestamp='',
+                        unreadMsgCount = '';
                     if (room && room.lastMessage) {
                         date.setTime(room.lastMessage.created_at);
                         author = room.lastMessage.userName;
                         description = room.lastMessage.message;
                         timestamp = createDateStamp(date);
+                        unreadMsgCount = room.unreadMessages;
                     }
                     if (roomName.split(' ').includes(this.props.curUserInfo.name)) {
                         roomName = roomName.replace(this.props.curUserInfo.name, '');
@@ -62,6 +64,7 @@ export const ChatList = connect(stateToProps)(class ChatList extends React.Compo
                             author: `${author}`,
                             description: `${description}`,
                             id: `${room._id}`,
+                            unreadMsgCount: `${unreadMsgCount}`,
                         }}
                         onclick={this.enterRoom.bind(this)}
                     />);
