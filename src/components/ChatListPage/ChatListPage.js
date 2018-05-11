@@ -86,9 +86,9 @@ export const ChatListPage = connect(stateToProps)(class ChatListPage extends Rea
 
     }
 
-    componentWillUnmount(){
-        // this.props.items.forEach((item)=>api.currentUserLeaveChannel(item._id));
-    }
+    // componentWillUnmount(){
+    //     // this.props.items.forEach((item)=>api.currentUserLeaveChannel(item._id));
+    // }
 
     fetch() {
         return this.props.dispatch(fetchRooms());
