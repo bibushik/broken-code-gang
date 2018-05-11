@@ -10,4 +10,4 @@ deploy:
   provider: heroku
   app: bcg-messenger
   api_key: 
-    secure: "b84a8f5e-0a9f-4112-88b1-c72e28483304"
+    secure: "20dbd5e7-cb3b-4dde-b35f-c294a0ab0a96"
