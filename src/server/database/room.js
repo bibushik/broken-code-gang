@@ -3,6 +3,7 @@ const { insertOrUpdateEntity, pageableCollection } = require('./helpers');
 const { getUser } = require('./user');
 
 const TABLE = 'rooms';
+const TABLE_VISIT = 'rooms_last_visit';
 
 /**
  * @typedef {{
@@ -130,7 +131,14 @@ async function joinRoom(db, { roomId, userId }) {
     // Save users to database
     await collection.updateOne({ _id: room._id }, { $set: { users: room.users } });
 
-    return room;
+    const payload = {
+        roomId,
+        userId,
+    };
+
+    const renamedRoom = await renameRoom(db, payload);
+
+    return renamedRoom;
 }
 
 /**
@@ -184,6 +192,103 @@ async function leaveRoom(db, { roomId, userId }) {
     // Save users to database
     await collection.updateOne({ _id: room._id }, { $set: { users: room.users } });
 
+    const payload = {
+        roomId,
+        userId,
+    };
+
+    const renamedRoom = await renameRoom(db, payload);
+
+    return renamedRoom;
+}
+
+/**
+ * @param {Db} db
+ * @param {string} roomId
+ * @param {string} userId
+ *
+ * @return {Promise<Room>} // last visit timestamp
+ */
+async function enterRoom(db, { roomId, userId }) {
+    if (!roomId) {
+        throw new Error('You must specify roomId to join');
+    }
+
+    if (!userId) {
+        throw new Error('You must specify userId to join');
+    }
+
+    let collection = db.collection(TABLE_VISIT),
+        [room, user] = await Promise.all([getRoom(db, roomId), getUser(db, userId)]);
+
+    if (!room) {
+        throw new Error(`Cannot find room with id=${roomId}`);
+    }
+
+    if (!user) {
+        throw new Error(`Unknown user with id=${userId}`);
+    }
+
+    room.users = room.users
+        .filter(user => user.toString() !== userId.toString());
+
+    // Save last visit to database
+    const lastVisit = Date.now();
+    await collection.updateOne({$and: [{ room_id: room._id }, {user_id: user._id} ]}, { $set: { last_visit: lastVisit  } });
+    return lastVisit;
+}
+
+/**
+ * @param {Db} db
+ * @param {*} data {roomId, userId - new user in room, newName - custom room name}
+ *
+ * @return {Promise<Room>}
+ */
+
+async function renameRoom(db, data) {
+    let { roomId, userId, newName } = data;
+
+    if (!roomId) {
+        throw new Error('You must specify roomId to rename');
+    }
+
+    if (!userId && !newName) {
+        throw new Error('You must specify new room user or room name');
+    }
+
+    let collection = db.collection(TABLE),
+        [room, user] = await Promise.all([getRoom(db, roomId), getUser(db, userId)]);
+
+    if (!room) {
+        throw new Error(`Cannot find room with id=${roomId}`);
+    }
+
+    if (userId && !room.customName) {
+
+        if (!user) {
+            throw new Error(`Unknown user with id=${userId}`);
+        }
+
+        let roomUsersNames = [];
+        for (let i = 0; i < room.users.length; i ++){
+            let userId = room.users[i];
+            let user = await getUser(db, userId);
+            roomUsersNames.push(user.name);
+        }
+        let newRoomName = roomUsersNames.join(', ');
+        room.name = `${newRoomName}`;
+
+        // Save nem room name to database
+        await collection.updateOne({ _id: room._id }, { $set: { name: room.name } });
+        return room;
+
+    } else if (newName) {
+        // Save nem room name to database
+        await collection.updateOne({ _id: room._id }, { $set: { name: newName, customName: true } });
+        let renamedRoom = await getRoom(db, room._id);
+        return renamedRoom;
+    }
+
     return room;
 }
 
@@ -195,5 +300,7 @@ module.exports = {
     getRoom,
     joinRoom,
     leaveRoom,
-    dropRoom
+    dropRoom,
+    renameRoom,
+    enterRoom
 };

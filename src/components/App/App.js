@@ -8,10 +8,13 @@ import { AddRoomPage } from '../AddRoomPage/AddRoomPage';
 import { ConnectedChatPage } from '../ChatPage/ChatPage';
 import { ConnectedUserPage } from '../UserPage/UserPage';
 import { ConnectedContactsListPage } from '../ContactsListPage/ContactsListPage';
-import { GroupChatSettings } from '../GroupChatSettings/GroupChatSettings';
+import { ConnectedGroupChatSettings } from '../GroupChatSettings/GroupChatSettings';
 import { ConnectedUserList } from '../UserList/UserList';
 import { ConnectedAddUserToChatPage } from '../AddUserToChatPage/AddUserToChatPage';
 import {routeNavigation} from '../../actions/route';
+import { addMessage } from '../../actions/messages';
+import { updateLastMessage, displayNewRoom } from '../../actions/rooms';
+import createBrowserNotification from '../../helpers/createBrowserNotification';
 import api from '../../api';
 
 // TODO: create page for the settings
@@ -39,7 +42,7 @@ const routeConfig = {
         view: ConnectedUserPage,
     },
     'chat_settings': {
-        view: GroupChatSettings,
+        view: ConnectedGroupChatSettings,
     },
     'add_new_user_to_chat_page':{
         view: ConnectedAddUserToChatPage,
@@ -48,6 +51,7 @@ const routeConfig = {
 
 const stateToProps = state => ({
     route: state.route,
+    rooms: state.rooms
 });
 
 class App extends Component {
@@ -68,6 +72,55 @@ class App extends Component {
             .then((user) => {
                 console.log(user);
                if (user){
+
+                   const app = this;
+
+                   api.onPendingConnection((roomId)=>{
+                       api.currentUserJoinChannel(roomId);
+                   });
+
+                   api.onMessage((message) => {
+                       console.log('onMessage');
+                       let isMessageFromNewRoom = app.props.rooms.items.filter((room) => {
+                           return message.roomId === room._id;
+                       });
+
+                       if (!isMessageFromNewRoom.length && app.props.route.page === 'chat_list'){
+                           app.props.dispatch(displayNewRoom(message.roomId));
+                       } else {
+                           app.props.dispatch(updateLastMessage(message));
+                       }
+
+                       if(app.props.route.page === 'chat_page' && app.props.route.payload.currentRoom === message.roomId){
+                           app.props.dispatch(addMessage(message));
+                       }
+
+                       if (message.userId) {
+
+                           if ((Notification.permission === "granted")) {
+                               const { roomId, userId, message: messageText } = message;
+
+                               Promise.all([ api.getUser(userId), api.getRoom(roomId)]).then((result) => {
+                                   const [{ name: userName }, { name: roomName }] = result;
+
+                                   createBrowserNotification(
+                                       roomName,
+                                       `${userName}: ${messageText}`,
+                                   );
+                               });
+                           }
+                       }
+
+                   });
+
+                   api.onUserLeavedRoom(async (result) => {
+                       console.log('onUserLeavedRoom');
+                   });
+
+                   api.onUserJoinedRoom(async (result) => {
+                       console.log('onUserJoinedRoom');
+                   });
+
                 this.props.dispatch(routeNavigation({
                     page: 'chat_list',
                     payload: {

@@ -1,23 +1,21 @@
 import api from '../api';
 import { routeNavigation } from './route';
 
-export default function leaveRoom(roomId) {
+export default function renameRoom(data) {
     return async function (dispatch) {
         try {
             // Loading
-            const room = await api.currentUserLeaveRoom(roomId);
-
-            if (room.users.length > 0 && room.users.length < 2) {
-                let r = await api.dropRoom(roomId);
+            if (!data){
+                return null;
             }
+            const room = await api.renameRoom(data.roomId, data.userId, data.newName);
 
             dispatch(routeNavigation({
-                page: 'chat_list',
+                page: "chat_settings",
                 payload: {
-                    footerNav: {
-                        active: 'chat'
-                    }
+                    roomName: room.name
                 }
+
             }));
         } catch (error) {
             dispatch({

@@ -1,5 +1,5 @@
 {
-  "name": "shri-boilerplate",
+  "name": "shri_messanger_maxishake",
   "version": "0.1.0",
   "private": true,
   "proxy": "http://localhost:3001/",
@@ -33,6 +33,7 @@
     "eject": "react-scripts eject",
     "client": "react-scripts start",
     "server": "nodemon -w server.js -w src/server server.js",
+    "server-dev": "nodemon -w server.js -w src/server --inspect server.js",
     "storybook": "start-storybook -p 9999 -c src/storybook",
     "githooks": "git config core.hooksPath hooks",
     "lint": "eslint ./src",

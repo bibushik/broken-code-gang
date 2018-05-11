@@ -19,6 +19,10 @@
     background-color: #F13564;
 }
 
+.ChatField_center {
+    background-color: #e2e2e2;
+}
+
 .ChatQuote__text {
     margin: 0;
     font: 16px 'Myriad Pro';

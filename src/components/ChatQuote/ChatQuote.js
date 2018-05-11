@@ -21,7 +21,9 @@ export class ChatQuote extends React.Component {
 
         date.setTime(created_at);
 
-        if (userId !== authorId) {
+        if(!authorId){
+            chatDirection = 'ChatQuote_center';
+        } else if (userId !== authorId) {
             chatDirection = 'ChatQuote_left';
             user = <p className="ChatQuote__user">{this.props.name}</p>
         }

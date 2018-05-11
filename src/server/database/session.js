@@ -1,4 +1,5 @@
 const { insertOrUpdateEntity } = require('./helpers');
+const { ObjectId } = require('mongodb');
 
 const TABLE = 'sessions';
 
@@ -36,9 +37,20 @@ async function deleteSessionInfo(db, sid) {
     return db.collection(TABLE).deleteMany({ sid: sid }).then(result => result || false);
 }
 
+/**
+ * @param {Db} db
+ * @param {userId} userId
+ *
+ * @returns {Promise}
+ */
+
+async function getSessionInfoByUserId (db, userId) {
+    return db.collection(TABLE).findOne({ userId: ObjectId(userId.toString()) });
+}
 
 module.exports = {
     getSessionInfo,
     saveSessionInfo,
     deleteSessionInfo,
+    getSessionInfoByUserId
 };

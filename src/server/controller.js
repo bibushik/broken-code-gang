@@ -1,8 +1,9 @@
-const { findUserBySid, getUsers, addUser, setCurrentUser, logoutUser } = require('./database/user');
+const { findUserBySid, getUsers, getUser, addUser, setCurrentUser, logoutUser } = require('./database/user');
 const {
-    joinRoom, leaveRoom, getRooms, getUserRooms, createRoom, getRoom, dropRoom
+    joinRoom, leaveRoom, getRooms, getUserRooms, createRoom, getRoom, dropRoom, renameRoom, enterRoom
 } = require('./database/room');
 const { getMessages, sendMessage } = require('./database/messages');
+const { getSessionInfoByUserId } = require('./database/session');
 const TYPES = require('./messages');
 
 /**
@@ -27,6 +28,7 @@ module.exports = function (db, io) {
      */
     io.on('connection', (socket) => {
         let { sid } = socket.request.cookies,
+            socketId = socket.id,
             isDisconnected = false;
 
         socket.join('broadcast');
@@ -138,6 +140,16 @@ module.exports = function (db, io) {
             return await CurrentUser();
         });
 
+        // // Receive room
+        // requestResponse(TYPES.GET_ROOM, async (roomId) => {
+        //     return await getRoomById(roomId);
+        // });
+        //
+        // //Load room info
+        // async function getRoomById(roomId) {
+        //     return await getRoom(db, roomId);
+        // }
+
         // Return list of all users with
         requestResponse(TYPES.USERS, async (params) => {
             return fillUsersWithStatus(await getUsers(db, params || {}));
@@ -176,6 +188,7 @@ module.exports = function (db, io) {
             payload = {
                 ...payload,
                 sid: sid,
+                socketId: socketId
             };
             return await setCurrentUser(db, payload);
         });
@@ -192,9 +205,14 @@ module.exports = function (db, io) {
             return getUserRooms(db, currentUser._id, params);
         });
 
-        // Join current user to room
+        // Drop room
         requestResponse(TYPES.DROP_ROOM, async (roomId) => {
             return await dropRoom(db, roomId);
+        });
+
+        // Rename room
+        requestResponse(TYPES.RENAME_ROOM, async ({roomId, userId, newName}) => {
+            return await renameRoom(db, {roomId, userId, newName});
         });
 
         // Join current user to room
@@ -205,15 +223,27 @@ module.exports = function (db, io) {
                 roomId,
                 userId: currentUser._id,
             };
-
             userWasJoinedToRoom(payload);
 
             return joinRoom(db, payload);
         });
 
         // Join user to room
-        requestResponse(TYPES.USER_JOIN_ROOM, (payload) => {
+        requestResponse(TYPES.USER_JOIN_ROOM, async (payload) => {
+            const userSession = await getSessionInfoByUserId (db, payload.userId);
+            if (userSession && userSession.socketId){
+                socket.to(userSession.socketId).emit(TYPES.PENDING_CONNECTION, payload.roomId);
+            }
             userWasJoinedToRoom(payload);
+
+            const userName = await getUser(db, payload.userId);
+            const message = `${userName.name} вошел чат`;
+            const msgPayload = {
+                roomId : payload.roomId,
+                message: message
+            };
+            const newSystemMsg = await sendMessage(db, msgPayload);
+            newMessage(newSystemMsg);
 
             return joinRoom(db, payload);
         });
@@ -230,7 +260,28 @@ module.exports = function (db, io) {
             leaveRoomChannel(roomId);
             userLeaveRoom(payload);
 
+            const userName = await getUser(db, payload.userId);
+            const message = `${userName.name} покинул чат`;
+            const msgPayload = {
+                roomId : payload.roomId,
+                message: message
+            };
+            const newSystemMsg = await sendMessage(db, msgPayload);
+            newMessage(newSystemMsg);
+
             return leaveRoom(db, payload);
+        });
+
+        // Current user enters room
+        requestResponse(TYPES.CURRENT_USER_ENTER_ROOM, async ({ roomId }) => {
+            const currentUser = await CurrentUser();
+
+            const payload = {
+                roomId,
+                userId: currentUser._id,
+            };
+
+            return enterRoom(db, payload);
         });
 
         // Remove user from room
@@ -254,9 +305,19 @@ module.exports = function (db, io) {
                 ...payload,
                 userId: currentUser._id,
             });
-
             newMessage(message);
 
+            return message;
+        });
+
+        // Send system message
+        requestResponse(TYPES.SEND_SYSTEM_MESSAGE, async (payload) => {
+            const message = await sendMessage(db, {
+                ...payload
+            });
+            debugger;
+            newMessage(message);
+            debugger;
             return message;
         });
 
@@ -278,7 +339,7 @@ module.exports = function (db, io) {
             const rooms = await getUserRooms(db, user._id);
 
             rooms.items.forEach((room) => {
-                joinToRoomChannel(db, room._id);
+                joinToRoomChannel(room._id);
             });
         });
 

@@ -39,6 +39,11 @@ module.exports = {
      */
     ROOMS: 'ROOMS',
 
+    // /**
+    //  * Return one room
+    //  */
+    // GET_ROOM: 'GET_ROOM',
+
     /**
      * Current user rooms
      */
@@ -70,6 +75,11 @@ module.exports = {
     CURRENT_USER_LEAVE_ROOM: 'CURRENT_USER_LEAVE_ROOM',
 
     /**
+     * Enter room
+     */
+    CURRENT_USER_ENTER_ROOM: 'CURRENT_USER_ENTER_ROOM',
+
+    /**
      * Remove user from room
      */
     REMOVE_USER_FROM_ROOM: 'REMOVE_USER_FROM_ROOM',
@@ -78,6 +88,11 @@ module.exports = {
      * Remove user from room
      */
     DROP_ROOM:'DROP_ROOM',
+
+    /**
+     * Rename room
+     */
+    RENAME_ROOM:'RENAME_ROOM',
 
     /**
      * Join user to the room
@@ -100,6 +115,11 @@ module.exports = {
     SEND_MESSAGE: 'SEND_MESSAGE',
 
     /**
+     * Send system message
+     */
+    SEND_SYSTEM_MESSAGE: 'SEND_SYSTEM_MESSAGE',
+
+    /**
      * Show list of messages
      */
     MESSAGES: 'MESSAGES',
@@ -110,7 +130,17 @@ module.exports = {
     MESSAGE: 'MESSAGE',
 
     /**
+     * New room has been created
+     */
+    ROOM: 'ROOM',
+
+    /**
      * Server error
      */
     ERROR: 'ERROR',
+
+    /**
+     * Pending socket connection
+     */
+    PENDING_CONNECTION: 'PENDING_CONNECTION'
 };

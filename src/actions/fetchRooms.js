@@ -13,7 +13,12 @@ export default function fetchRooms() {
                 let lastMessage = {};
                 if(messages.items.length>0){
                     lastMessage = messages.items[0];
-                    lastMessage.userName = (await api.getUser(lastMessage.userId)).name;
+                    if (lastMessage.userId) {
+                        lastMessage.userName = (await api.getUser(lastMessage.userId)).name;
+                    } else {
+                        lastMessage.userName = "";
+                    }
+
                     item.lastMessage = lastMessage;
                 }
                 else {

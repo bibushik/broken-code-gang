@@ -47,7 +47,7 @@ async function getUser(db, userId) {
  *
  * @returns {Promise<User>}
  */
-async function setCurrentUser(db, { userId, sid }) {
+async function setCurrentUser(db, { userId, sid, socketId }) {
     if (!userId) {
         throw new Error('User id required');
     }
@@ -56,10 +56,11 @@ async function setCurrentUser(db, { userId, sid }) {
         throw new Error('Session id required');
     }
 
-    await deleteSessionInfo(db, sid);
+    await deleteSessionInfo(db, sid, socketId);
     let session = {
         userId: ObjectId(userId),
         sid: sid,
+        socketId: socketId
     };
     await saveSessionInfo(db, session);
     return await findUserBySid(db, sid);

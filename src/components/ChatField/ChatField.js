@@ -11,7 +11,9 @@ export function ChatField(props) {
     let direction = 'ChatField_right',
         avatar = '';
 
-    if (authorId !== userId) {
+    if (!authorId) {
+        direction = 'ChatField_center';
+    } else if (authorId !== userId) {
         direction = 'ChatField_left';
         /*
          *Здесь загружаем иконку аватара по userId

@@ -40,7 +40,7 @@ export const ChatList = connect(stateToProps)(class ChatList extends React.Compo
                         author='',
                         description='',
                         timestamp='';
-                    if (room && room.lastMessage && room.lastMessage.userName) {
+                    if (room && room.lastMessage) {
                         date.setTime(room.lastMessage.created_at);
                         author = room.lastMessage.userName;
                         description = room.lastMessage.message;

@@ -47,6 +47,11 @@ export default function rooms(state, action) {
             });
             newState.items.sort(compareMessages);
             return newState;
+        case 'ROOMS_DISPLAY_NEW_ROOM':
+            return {
+                ...state,
+                items: [action.room, ...state.items],
+            };
         case 'ROOMS_ERROR':
             return {
                 ...state,

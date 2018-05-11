@@ -23,10 +23,6 @@ const TABLE = 'messages';
  * @return {Promise<Message>}
  */
 async function sendMessage(db, { userId, roomId, message }) {
-    if (!userId) {
-        throw new Error('userId required');
-    }
-
     if (!roomId) {
         throw new Error('roomId required');
     }
@@ -35,22 +31,38 @@ async function sendMessage(db, { userId, roomId, message }) {
         throw new Error('Cannot send empty message');
     }
 
-    const [user, room] = await Promise.all([getUser(db, userId), getRoom(db, roomId)]);
+    let user, room = '';
 
-    if (!user) {
-        throw new Error(`Cannot find user with id=${userId}`);
+    if (userId){
+        ([user, room] = await Promise.all([getUser(db, userId), getRoom(db, roomId)]));
+        if (!user) {
+            throw new Error(`Cannot find user with id=${userId}`);
+        }
+    } else {
+        room = await getRoom(db, roomId);
     }
 
     if (!room) {
         throw new Error(`Cannot find room with id=${roomId}`);
     }
 
-    const messageEntity = {
-        userId: user._id,
-        roomId: room._id,
-        message,
-        created_at: Date.now(),
-    };
+    let messageEntity = {};
+    if (user) {
+        messageEntity = {
+            userId: user._id,
+            roomId: room._id,
+            message,
+            created_at: Date.now(),
+        };
+    } else {
+        messageEntity = {
+            roomId: room._id,
+            message,
+            created_at: Date.now(),
+        };
+    }
+
+
 
     const result = await db.collection(TABLE).insertOne(messageEntity);
     messageEntity._id = result.insertedId;

@@ -225,6 +225,19 @@ class Api {
     }
 
     /**
+     * Rename room
+     *
+     * @param {string} roomId
+     * @param {string} userId
+     * @param {string} newName
+     *
+     * @return {Promise<Room>}
+     */
+    async renameRoom(roomId, userId, newName) {
+        return this._requestResponse(MESSAGES.RENAME_ROOM, {roomId, userId, newName});
+    }
+
+    /**
      * Current user leave the room
      *
      * @param {string} roomId
@@ -233,6 +246,17 @@ class Api {
      */
     async currentUserLeaveRoom(roomId) {
         return this._requestResponse(MESSAGES.CURRENT_USER_LEAVE_ROOM, { roomId });
+    }
+
+    /**
+     * Current user leave the room
+     *
+     * @param {string} roomId
+     *
+     * @return {Promise<Room>}
+     */
+    async currentUserEnterRoom(roomId) {
+        return this._requestResponse(MESSAGES.CURRENT_USER_ENTER_ROOM, { roomId });
     }
 
     /**
@@ -257,6 +281,18 @@ class Api {
      */
     async sendMessage(roomId, message) {
         return this._requestResponse(MESSAGES.SEND_MESSAGE, { roomId, message });
+    }
+
+    /**
+     * Send system message to the room
+     *
+     * @param {string} roomId
+     * @param {string} message
+     *
+     * @return {Promise<Message>}
+     */
+    async sendSystemMessage(roomId, message) {
+        return this._requestResponse(MESSAGES.SEND_SYSTEM_MESSAGE, { roomId, message });
     }
 
     /**
@@ -340,8 +376,12 @@ class Api {
      */
     async onMessage(callback) {
         await this._connectPromise;
-
         this.io.on(MESSAGES.MESSAGE, callback);
+    }
+
+    async onPendingConnection(callback) {
+        await this._connectPromise;
+        this.io.on(MESSAGES.PENDING_CONNECTION, callback);
     }
 }
 

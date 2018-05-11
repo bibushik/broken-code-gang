@@ -55,6 +55,7 @@ export class ChatPage extends Component {
                 prevPrevPage:'chat_list',
                 prevPage: 'chat_page',
                 chatUsers:users.items,
+                roomName: room.name
             }
         }));
     }
@@ -71,6 +72,9 @@ export class ChatPage extends Component {
     }
 
     render() {
+
+        //api.currentUserEnterRoom(this.props.payload.currentRoom);
+
         const messages = this.props.messages.items,
             next = this.props.messages.next,
             userId = this.props.userId,
