@@ -35,7 +35,7 @@ export class ChatPage extends Component {
 
     componentWillMount = async () => {
         this.getChatInfo(this.props.payload.currentRoom);
-        await api.currentUserEnterRoom(this.props.payload.currentRoom);
+       // await api.currentUserEnterRoom(this.props.payload.currentRoom);
     };
 
     getChatInfo = async (chatId) => {
@@ -68,9 +68,9 @@ export class ChatPage extends Component {
         }
     }
     
-    componentWillUnmount = async () => {
-        await api.currentUserEnterRoom(this.props.payload.currentRoom);
-    };
+    // componentWillUnmount = async () => {
+    //     await api.currentUserEnterRoom(this.props.payload.currentRoom);
+    // };
 
     render() {
 

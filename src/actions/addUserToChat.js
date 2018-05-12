@@ -4,9 +4,9 @@ export default function addUserToChat(roomId, contactId) {
     return async function (dispatch, getState) {
         try {
             await api.userJoinRoom(contactId, roomId);
-            const userName = await api.getUser(contactId);
-            const message = `${userName.name} теперь в чате`;
-            api.sendSystemMessage(roomId, message);
+            // const userName = await api.getUser(contactId);
+            // const message = `${userName.name} теперь в чате`;
+            // api.sendSystemMessage(roomId, message);
             const roomUsers = await api.getUsersOfRoom(roomId);
             dispatch({
                 type: 'USER_ADDED_TO_CHAT',

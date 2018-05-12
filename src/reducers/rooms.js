@@ -40,9 +40,9 @@ export default function rooms(state, action) {
                 };
             newItems.forEach((item) => {
                 if (item._id === (action && action.newMessage.roomId)) {
-                    if (action.newRoomName){
-                        item.name = action.newRoomName;
-                    }
+                    // if (action.newRoomName){
+                    //     item.name = action.newRoomName;
+                    // }
                     item.lastMessage = action.newMessage;
                     newState.items =  newItems;
                 }
