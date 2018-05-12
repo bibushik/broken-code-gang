@@ -6,7 +6,6 @@ export default function leaveRoom(roomId) {
         try {
             // Loading
             const room = await api.currentUserLeaveRoom(roomId);
-
             if (room.users.length > 0 && room.users.length < 2) {
                 await api.dropRoom(roomId);
             }

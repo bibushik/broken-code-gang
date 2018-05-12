@@ -48,9 +48,16 @@ async function getSessionInfoByUserId (db, userId) {
     return db.collection(TABLE).findOne({ userId: ObjectId(userId.toString()) });
 }
 
+
+async function updateSocketIdBySid (db, sid, socketId) {
+    console.log("Ready to change");
+    return db.collection(TABLE).updateOne({ sid: sid }, {$set: {socketId: socketId}} );
+}
+
 module.exports = {
     getSessionInfo,
     saveSessionInfo,
     deleteSessionInfo,
-    getSessionInfoByUserId
+    getSessionInfoByUserId,
+    updateSocketIdBySid
 };

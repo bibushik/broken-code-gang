@@ -74,6 +74,7 @@ class App extends Component {
                    const app = this;
 
                    api.onPendingConnection((roomId)=>{
+                       console.log('On pending');
                        api.currentUserJoinChannel(roomId);
                    });
 

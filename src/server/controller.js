@@ -3,7 +3,7 @@ const {
     joinRoom, leaveRoom, getRooms, getUserRooms, createRoom, getRoom, dropRoom, renameRoom, enterRoom, getLastRoomVisit
 } = require('./database/room');
 const { getMessages, sendMessage } = require('./database/messages');
-const { getSessionInfoByUserId } = require('./database/session');
+const { getSessionInfoByUserId, updateSocketIdBySid } = require('./database/session');
 const TYPES = require('./messages');
 
 /**
@@ -30,7 +30,8 @@ module.exports = function (db, io) {
         let { sid } = socket.request.cookies,
             socketId = socket.id,
             isDisconnected = false;
-
+        updateSocketIdBySid(db, sid, socketId);
+        console.log("I'm back! sid " + sid + "sicketId " + socket.id);
         socket.join('broadcast');
 
         /**
@@ -243,19 +244,12 @@ module.exports = function (db, io) {
         // Join user to room
         requestResponse(TYPES.USER_JOIN_ROOM, async (payload) => {
             const userSession = await getSessionInfoByUserId (db, payload.userId);
+            debugger;
             if (userSession && userSession.socketId){
+                debugger;
                 socket.to(userSession.socketId).emit(TYPES.PENDING_CONNECTION, payload.roomId);
             }
             userWasJoinedToRoom(payload);
-
-            const userName = await getUser(db, payload.userId);
-            const message = `${userName.name} теперь в чате`;
-            const msgPayload = {
-                roomId : payload.roomId,
-                message: message
-            };
-            const newSystemMsg = await sendMessage(db, msgPayload);
-            newMessage(newSystemMsg);
 
             return joinRoom(db, payload);
         });
@@ -327,9 +321,9 @@ module.exports = function (db, io) {
             const message = await sendMessage(db, {
                 ...payload
             });
-            debugger;
+
             newMessage(message);
-            debugger;
+
             return message;
         });
 
@@ -356,6 +350,7 @@ module.exports = function (db, io) {
         });
 
         socket.on('disconnect', async () => {
+            console.log("I'm lost(  userId: " + user._id);
             isDisconnected = true;
             const user = await CurrentUser();
 

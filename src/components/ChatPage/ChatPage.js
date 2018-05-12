@@ -68,9 +68,9 @@ export class ChatPage extends Component {
         }
     }
     
-    componentWillUnmount(){
-        // api.currentUserLeaveChannel(this.props.payload.currentRoom);
-    }
+    componentWillUnmount = async () => {
+        await api.currentUserEnterRoom(this.props.payload.currentRoom);
+    };
 
     render() {
 
