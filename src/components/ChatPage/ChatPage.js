@@ -35,7 +35,7 @@ export class ChatPage extends Component {
 
     componentWillMount = async () => {
         this.getChatInfo(this.props.payload.currentRoom);
-        const lastVisit = await api.currentUserEnterRoom(this.props.payload.currentRoom);
+        await api.currentUserEnterRoom(this.props.payload.currentRoom);
     };
 
     getChatInfo = async (chatId) => {
