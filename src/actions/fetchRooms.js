@@ -17,7 +17,7 @@ export default function fetchRooms() {
                 // }
                 const messages = await api.getLastRoomMessages(item._id);
                 let lastMessage = {};
-                let unreadMessages = 0;
+                //let unreadMessages = 0;
                 if(messages.items.length>0){
                     lastMessage = messages.items[0];
                     if (lastMessage.userId) {
